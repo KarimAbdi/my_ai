@@ -57,6 +57,20 @@ const Editor: React.FC<EditorProps> = ({ image, onReset }) => {
         checkApiKey();
     }, [checkApiKey]);
 
+    const handleSelectKey = async () => {
+        setError(null); // Clear previous errors before trying again
+        try {
+            await window.aistudio.openSelectKey();
+            // After the dialog closes, re-check for the key.
+            // This optimistically triggers the generation effect.
+            setApiKeyReady(true);
+        } catch (e) {
+            console.error("Error opening select key dialog:", e);
+            setError("Could not open the API key selection dialog. Please try again.");
+            setApiKeyReady(false); // Explicitly ensure we show the prompt/error again
+        }
+    };
+
     useEffect(() => {
         if (!image || !apiKeyReady) return;
 
@@ -140,18 +154,39 @@ const Editor: React.FC<EditorProps> = ({ image, onReset }) => {
         document.body.removeChild(link);
     }, [cartoonifiedImage]);
 
-    const handleSelectKey = async () => {
-        try {
-            await window.aistudio.openSelectKey();
-            // After the dialog closes, re-check for the key.
-            // This optimistically triggers the generation effect.
-            setApiKeyReady(true);
-        } catch (e) {
-            console.error("Error opening select key dialog:", e);
-            setError("Could not open the API key selection dialog.");
+    const renderContent = () => {
+        if (error) {
+            return (
+                <div className="p-4 text-center text-red-400">
+                    <p className="font-semibold">Oh no! Something went wrong.</p>
+                    <p className="text-sm mt-2">{error}</p>
+                    {/* If the error is an API key issue, allow the user to try again */}
+                    {!apiKeyReady && (
+                        <button
+                            onClick={handleSelectKey}
+                            className="mt-6 px-5 py-2.5 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 transition-transform transform hover:scale-105"
+                        >
+                            Select API Key
+                        </button>
+                    )}
+                </div>
+            );
         }
+        if (!apiKeyReady) {
+            return <ApiKeyPrompt onSelect={handleSelectKey} />;
+        }
+        if (isGenerating) {
+            return <Loader />;
+        }
+        if (cartoonifiedImage) {
+            return <img src={cartoonifiedImage} alt="Cartoonified" className="w-full h-full object-contain" />;
+        }
+        return (
+            <div className="p-4 text-center text-slate-400">
+                <p>Your cartoon will appear here.</p>
+            </div>
+        );
     };
-
 
     return (
         <div className="w-full flex flex-col items-center animate-fade-in">
@@ -168,22 +203,7 @@ const Editor: React.FC<EditorProps> = ({ image, onReset }) => {
                 <div className="flex flex-col items-center">
                     <h2 className="text-xl font-bold text-slate-300 mb-4">Cartoonified</h2>
                     <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-800 shadow-lg ring-1 ring-white/10 flex items-center justify-center">
-                       {!apiKeyReady ? (
-                            <ApiKeyPrompt onSelect={handleSelectKey} />
-                        ) : isGenerating ? (
-                            <Loader />
-                        ) : error ? (
-                            <div className="p-4 text-center text-red-400">
-                                <p className="font-semibold">Oh no! Something went wrong.</p>
-                                <p className="text-sm mt-2">{error}</p>
-                            </div>
-                        ) : cartoonifiedImage ? (
-                            <img src={cartoonifiedImage} alt="Cartoonified" className="w-full h-full object-contain" />
-                        ) : (
-                            <div className="p-4 text-center text-slate-400">
-                                <p>Your cartoon will appear here.</p>
-                            </div>
-                        )}
+                       {renderContent()}
                     </div>
                 </div>
             </div>
