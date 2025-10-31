@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo Cartoonizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for range slider for better cross-browser appearance */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            cursor: pointer;
+            outline: none;
+            border-radius: 9999px;
+            background-color: #334155; /* slate-700 */
+            height: 0.5rem;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #a855f7; /* purple-500 */
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #0f172a; /* slate-900 */
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #a855f7; /* purple-500 */
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #0f172a; /* slate-900 */
+            transition: background-color 0.2s ease-in-out;
+        }
+        
+        input[type="range"]:hover::-webkit-slider-thumb {
+            background-color: #c084fc; /* purple-400 */
+        }
+
+        input[type="range"]:hover::-moz-range-thumb {
+            background-color: #c084fc; /* purple-400 */
+        }
+        
+        /* Fade-in animation for when the editor appears */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Styles for the cartoonish download button */
+        .cartoon-button {
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s ease-out;
+            box-shadow: 3px 3px 0px #0f172a; /* slate-900 */
+        }
+
+        .cartoon-button:hover:not(:disabled) {
+            transform: scale(1.05) rotate(-3deg);
+            box-shadow: 5px 5px 0px #0f172a;
+        }
+
+        .cartoon-button:active:not(:disabled) {
+            transform: scale(0.98) rotate(1deg);
+            box-shadow: 1px 1px 0px #0f172a;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0"
+  }
+}
+</script>
+</head>
+<body class="bg-slate-900 text-white antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
